@@ -1,0 +1,6 @@
+{
+  "name": "ETS Chipeaux — Chauffage, Plomberie & Climatisation",
+  "description": "Entreprise spécialisée en génie thermique, chauffage, plomberie, tuyauterie industrielle et climatisation pour particuliers, tertiaire et industrie.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

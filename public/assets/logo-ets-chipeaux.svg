@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 348" width="1024" height="348" role="img" aria-label="ETS Chipeaux">
+  <!-- Arc thermique extérieur orange -->
+  <path
+    d="M 142 26 C 68 38, 22 104, 28 178 C 35 256, 108 312, 266 322 C 138 292, 68 232, 62 158 C 57 96, 92 44, 142 26 Z"
+    fill="#F0412B"
+  />
+  <!-- Arc intérieur bleu indigo -->
+  <path
+    d="M 78 134 C 98 228, 178 292, 268 292 C 322 292, 344 252, 342 204 C 334 240, 304 268, 256 266 C 178 264, 114 206, 78 134 Z"
+    fill="#2A3387"
+  />
+  <!-- Wordmark ETS CHIPEAUX -->
+  <text
+    x="172"
+    y="168"
+    fill="#2A3387"
+    font-family="system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-weight="800"
+    font-size="94"
+    letter-spacing="1"
+  >ETS CHIPEAUX</text>
+</svg>
