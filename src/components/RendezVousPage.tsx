@@ -17,6 +17,9 @@ const SERVICE_OPTIONS = [
   'Autre demande',
 ];
 
+const WEB3FORMS_ENDPOINT = 'https://api.web3forms.com/submit';
+const WEB3FORMS_ACCESS_KEY = '19078c47-4d90-4a66-ae22-e46a08be3db7';
+
 function isValidFrenchPhone(value: string): boolean {
   const cleaned = value.replace(/[\s.-]/g, '');
   return /^(?:(?:\+|00)33|0)[1-9]\d{8}$/.test(cleaned);
@@ -36,8 +39,10 @@ export function RendezVousPage({ preselectedService, onNavigate }: RendezVousPag
   const [creneau, setCreneau] = useState('En journée (8h – 18h)');
   const [message, setMessage] = useState('');
   const [consent, setConsent] = useState(false);
+  const [botcheck, setBotcheck] = useState('');
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
@@ -46,8 +51,9 @@ export function RendezVousPage({ preselectedService, onNavigate }: RendezVousPag
     }
   }, [preselectedService]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setErrorMsg(null);
 
     if (!nom.trim()) {
@@ -71,7 +77,55 @@ export function RendezVousPage({ preselectedService, onNavigate }: RendezVousPag
       return;
     }
 
-    setSubmitted(true);
+    // Honeypot anti-spam : si rempli par un robot, on simule le succès sans envoyer
+    if (botcheck) {
+      setSubmitted(true);
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const payload: Record<string, string | boolean> = {
+        access_key: WEB3FORMS_ACCESS_KEY,
+        subject: `Nouvelle demande de RDV — ${service} (${nom.trim()})`,
+        from_name: 'Site ETS Chipeaux',
+        'Nom et prénom': nom.trim(),
+        'Téléphone': tel.trim(),
+        'E-mail': email.trim() || 'Non renseigné',
+        'Ville ou commune': ville.trim() || 'Non précisée',
+        'Profil': clientType,
+        'Domaine concerné': service,
+        'Disponibilité souhaitée': creneau,
+        'Description': message.trim(),
+        botcheck: false,
+      };
+      if (email.trim()) {
+        payload.replyto = email.trim();
+      }
+
+      const response = await fetch(WEB3FORMS_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json().catch(() => null);
+
+      if (!response.ok || !result?.success) {
+        throw new Error(result?.message || "L'envoi automatique a échoué.");
+      }
+
+      setSubmitted(true);
+    } catch {
+      setErrorMsg(
+        `Impossible d’envoyer la demande pour le moment. Merci d’appeler directement le ${ETS_CONFIG.tel} ou d’écrire à ${ETS_CONFIG.email}.`
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -118,13 +172,14 @@ export function RendezVousPage({ preselectedService, onNavigate }: RendezVousPag
                 <div className="mt-6 border-l-2 border-[#2A3387] pl-5 py-2 space-y-3">
                   <div className="flex items-center gap-2 text-[#2A3387] font-semibold">
                     <Check className="w-5 h-5" aria-hidden="true" />
-                    <span>Demande enregistrée</span>
+                    <span>Demande envoyée avec succès</span>
                   </div>
                   <p className="text-[#2B3038]">
                     Merci <strong>{nom}</strong>. Votre demande concernant «{' '}
-                    <strong>{service}</strong> » ({creneau}) a bien été préparée.
+                    <strong>{service}</strong> » ({creneau}) a bien été transmise par e-mail à
+                    ETS Chipeaux.
                   </p>
-                  <p className="text-sm text-[#6E7381]">
+                  <p className="text-sm text-[#525866]">
                     Thomas Chipeaux vous recontactera au{' '}
                     <strong className="tabular-nums">{tel}</strong>. Pour toute urgence immédiate,
                     vous pouvez également appeler directement le{' '}
@@ -140,24 +195,28 @@ export function RendezVousPage({ preselectedService, onNavigate }: RendezVousPag
                       onClick={() => {
                         setSubmitted(false);
                         setMessage('');
+                        setErrorMsg(null);
                       }}
                     >
                       Envoyer une autre demande
                     </button>
-                    <a
-                      href={`mailto:${ETS_CONFIG.email}?subject=${encodeURIComponent(
-                        `Demande ETS Chipeaux — ${service}`
-                      )}&body=${encodeURIComponent(
-                        `Nom : ${nom}\nTéléphone : ${tel}\nVille : ${ville || 'Non précisée'}\nProfil : ${clientType}\nCréneau : ${creneau}\n\n${message}`
-                      )}`}
-                      className="btn btn--ligne"
-                    >
-                      Ouvrir dans mon client mail
+                    <a href={ETS_CONFIG.telHref} className="btn btn--ligne">
+                      Appeler le {ETS_CONFIG.tel}
                     </a>
                   </div>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} noValidate>
+                  <input
+                    type="text"
+                    name="botcheck"
+                    value={botcheck}
+                    onChange={(e) => setBotcheck(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="visually-hidden"
+                  />
                   {errorMsg && (
                     <div
                       role="alert"
@@ -298,8 +357,13 @@ export function RendezVousPage({ preselectedService, onNavigate }: RendezVousPag
                     </div>
                   </div>
 
-                  <button type="submit" className="btn btn--principal btn--grand">
-                    Envoyer ma demande
+                  <button
+                    type="submit"
+                    className="btn btn--principal btn--grand"
+                    disabled={isSubmitting}
+                    aria-busy={isSubmitting}
+                  >
+                    {isSubmitting ? 'Envoi en cours…' : 'Envoyer ma demande'}
                   </button>
                 </form>
               )}

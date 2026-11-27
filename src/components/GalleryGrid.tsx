@@ -58,6 +58,7 @@ export function GalleryGrid({ photos, ariaLabel = 'Galerie de chantiers' }: Gall
               alt={photo.alt}
               width={photo.width}
               height={photo.height}
+              style={photo.objectPosition ? { objectPosition: photo.objectPosition } : undefined}
               loading="lazy"
               decoding="async"
               referrerPolicy="no-referrer"

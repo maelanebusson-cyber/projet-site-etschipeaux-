@@ -18,6 +18,7 @@ export interface ChantierPhoto {
   width: number;
   height: number;
   serviceId: ServiceId;
+  objectPosition?: string;
 }
 
 export type ServiceId =
@@ -41,6 +42,7 @@ export interface ServiceItem {
   note: string;
   heroPhoto?: string;
   heroAlt?: string;
+  heroPosition?: string;
   faq: Array<{ question: string; answer: string }>;
 }
 
@@ -96,6 +98,7 @@ export const ALL_PHOTOS: ChantierPhoto[] = [
     width: 768,
     height: 1024,
     serviceId: 'chauffage',
+    objectPosition: 'center 78%',
   },
   {
     src: '/assets/chantiers/chauffage-pompe-chaleur-ecodan.jpg',
@@ -261,6 +264,7 @@ export const HOME_PREVIEW_FILES = [
   'chauffage-pompe-chaleur-bosch.jpg',
   'climatisation-unite-exterieure-daikin.jpg',
   'industriel-nourrice-prefabriquee.jpg',
+  'industriel-coudes-calorifuges-local-technique.jpg',
 ];
 
 export const SERVICES: ServiceItem[] = [
@@ -287,6 +291,7 @@ export const SERVICES: ServiceItem[] = [
       'Besoin de remplacer votre chaudière ou de passer à une pompe à chaleur ? Nous dimensionnons votre installation sur place et établissons un devis gratuit.',
     heroPhoto: '/assets/chantiers/chauffage-pompe-chaleur-bosch.jpg',
     heroAlt: "Unité extérieure d'une pompe à chaleur Bosch installée par ETS Chipeaux",
+    heroPosition: 'center 78%',
     faq: [
       {
         question: 'Quel système choisir entre chaudière gaz et pompe à chaleur ?',

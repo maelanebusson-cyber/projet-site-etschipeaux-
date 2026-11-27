@@ -30,9 +30,9 @@ const VALID_PAGES = new Set<PageId>([
 ]);
 
 function readPageFromHash(): PageId {
-  if (typeof window === 'undefined') return 'service-industriel';
+  if (typeof window === 'undefined') return 'accueil';
   const raw = window.location.hash.replace(/^#\/?/, '').trim() as PageId;
-  return VALID_PAGES.has(raw) ? raw : 'service-industriel';
+  return VALID_PAGES.has(raw) ? raw : 'accueil';
 }
 
 function getDocumentTitle(page: PageId): string {

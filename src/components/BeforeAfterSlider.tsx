@@ -49,8 +49,8 @@ export function BeforeAfterSlider() {
         <img
           src="/assets/source/entretien-chaudiere-avant.png"
           alt="Corps de chauffe encrassé avant entretien complet par ETS Chipeaux"
-          width={876}
-          height={913}
+          width={684}
+          height={864}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
@@ -62,8 +62,8 @@ export function BeforeAfterSlider() {
           <img
             src="/assets/source/entretien-chaudiere-apres.png"
             alt="Corps de chauffe nettoyé et réglé après entretien par ETS Chipeaux"
-            width={876}
-            height={913}
+            width={684}
+            height={864}
             loading="lazy"
             referrerPolicy="no-referrer"
           />

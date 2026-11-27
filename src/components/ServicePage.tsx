@@ -82,6 +82,7 @@ export function ServicePage({ service, onNavigate }: ServicePageProps) {
                   alt={service.heroAlt || service.nom}
                   width={768}
                   height={1024}
+                  style={service.heroPosition ? { objectPosition: service.heroPosition } : undefined}
                   referrerPolicy="no-referrer"
                 />
               </figure>
